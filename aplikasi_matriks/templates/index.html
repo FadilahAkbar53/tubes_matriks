@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Aplikasi Matriks</title>
+  </head>
+  <body>
+    <h1>Penjumlahan Matriks</h1>
+    <form method="post">
+      <h2>Matriks A</h2>
+      <input name="a11" type="text" required />
+      <input name="a12" type="text" required /><br />
+      <input name="a21" type="text" required />
+      <input name="a22" type="text" required /><br />
+      <h2>Matriks B</h2>
+      <input name="b11" type="text" required />
+      <input name="b12" type="text" required /><br />
+      <input name="b21" type="text" required />
+      <input name="b22" type="text" required /><br />
+      <button type="submit">Hitung</button>
+    </form>
+    {% if result %}
+    <h2>Hasil Penjumlahan:</h2>
+    <p>{{ result }}</p>
+    {% endif %}
+  </body>
+</html>
