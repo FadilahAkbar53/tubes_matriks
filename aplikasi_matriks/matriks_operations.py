@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox, Scrollbar, Frame
 import numpy as np
 
+
 def reset_fields():
     """Reset semua input dan hasil."""
     entry_rows_a.delete(0, tk.END)
@@ -14,6 +15,9 @@ def reset_fields():
     text_result.delete("1.0", tk.END)
     operation.set("Penjumlahan")
     option_matrix.set("Matriks A")
+    entry_scalar.grid_remove()  # Pastikan skalar juga disembunyikan saat reset
+    entry_scalar_label.grid_remove()
+
 
 def create_matrix_entries():
     """Buat entri matriks berdasarkan input pengguna."""
@@ -24,7 +28,7 @@ def create_matrix_entries():
         cols_b = int(entry_cols_b.get())
 
         if (operation.get() in ["Penjumlahan", "Pengurangan"] and (rows_a != rows_b or cols_a != cols_b)) or \
-           (operation.get() == "Perkalian Matriks" and cols_a != rows_b):
+                (operation.get() == "Perkalian Matriks" and cols_a != rows_b):
             messagebox.showerror("Error", "Ukuran matriks tidak sesuai untuk operasi yang dipilih.")
             return
 
@@ -53,6 +57,7 @@ def create_matrix_entries():
     except ValueError:
         messagebox.showerror("Error", "Masukkan angka yang valid.")
 
+
 def clear_matrix_entries():
     """Hapus entri matriks yang ada."""
     for entry in entries_a:
@@ -64,9 +69,11 @@ def clear_matrix_entries():
     entries_a.clear()
     entries_b.clear()
 
+
 def format_matrix(matrix):
     """Format output sebagai string matriks."""
     return "\n".join(["\t".join([f"{val:.2f}" for val in row]) for row in matrix])
+
 
 def perform_operation():
     """Lakukan operasi berdasarkan pilihan pengguna."""
@@ -123,7 +130,7 @@ def perform_operation():
                 for i in range(rows_a):
                     for j in range(cols_b):
                         step_value = sum(a[i][k] * b[k][j] for k in range(cols_a))
-                        steps += f"Baris {i+1}, Kolom {j+1}: "
+                        steps += f"Baris {i + 1}, Kolom {j + 1}: "
                         steps += " + ".join([f"({a[i][k]} * {b[k][j]})" for k in range(cols_a)]) + f" = {step_value}\n"
 
             elif operation.get() == "Determinant":
@@ -147,7 +154,8 @@ def perform_operation():
                 result = np.linalg.inv(a)
                 steps += "Langkah-langkah Invers:\n"
                 steps += format_matrix(result) + "\n"
-                
+
+            # Tambahkan operasi lain sesuai kebutuhan
             elif operation.get() == "Gauss-Jordan":
                 try:
                     # Implementasi eliminasi Gauss-Jordan
@@ -160,14 +168,14 @@ def perform_operation():
                         # Mencari baris dengan nilai maksimum di kolom i
                         max_row = np.argmax(np.abs(a[i:, i])) + i
                         if max_row != i:
-                            steps += f"Tukar baris {i+1} dengan baris {max_row+1}\n"
+                            steps += f"Tukar baris {i + 1} dengan baris {max_row + 1}\n"
                         a[[i, max_row]] = a[[max_row, i]]
 
                         # Buat pivot menjadi 1
                         pivot = a[i, i]
                         if pivot != 0:
                             a[i] = a[i] / pivot
-                            steps += f"Skalakan baris {i+1} agar elemen pivot menjadi 1\n"
+                            steps += f"Skalakan baris {i + 1} agar elemen pivot menjadi 1\n"
 
                         # Eliminasi elemen di atas dan di bawah pivot
                         for j in range(m):
@@ -175,13 +183,13 @@ def perform_operation():
                                 factor = a[j, i]
                                 if factor != 0:
                                     a[j] = a[j] - factor * a[i]
-                                    steps += f"Kurangi {factor} * baris {i+1} dari baris {j+1}\n"
+                                    steps += f"Kurangi {factor} * baris {i + 1} dari baris {j + 1}\n"
 
                     # Output hasil akhir
                     result = a
                     steps += "Matriks setelah eliminasi Gauss-Jordan:\n"
                     steps += format_matrix(result) + "\n"
-                    
+
                 except Exception as e:
                     messagebox.showerror("Error", f"Terjadi kesalahan: {e}")
                     return
@@ -190,7 +198,7 @@ def perform_operation():
                 try:
                     augmented_matrix = np.hstack([a, b])
                     rows, cols = augmented_matrix.shape
-                    
+
                     # Eliminasi Gauss
                     for i in range(min(rows, cols - 1)):
                         if augmented_matrix[i, i] == 0:
@@ -216,7 +224,7 @@ def perform_operation():
                             break
                         elif np.all(augmented_matrix[i] == 0):
                             infinite_solutions = True
-                    
+
                     if no_solution:
                         text_result.insert(tk.END, "SPL tidak memiliki solusi.\n")
                         steps += "Sistem tidak memiliki solusi.\n"
@@ -232,6 +240,25 @@ def perform_operation():
                 except Exception as e:
                     messagebox.showerror("Error", f"Terjadi kesalahan: {e}")
                     return
+                # Tambahkan operasi lain sesuai kebutuhan
+            elif operation.get() == "Jordan Normal Form":
+                try:
+                    import sympy as sp
+
+                    # Mengonversi input ke matriks SymPy
+                    A = sp.Matrix(a)
+
+                    # Menghitung Jordan Normal Form dan matriks basis
+                    J, P = A.jordan_form()
+
+                    steps += "Langkah-langkah mencari Jordan Normal Form:\n"
+                    steps += "Matriks A:\n" + format_matrix(A) + "\n"
+                    steps += "Jordan Normal Form:\n" + format_matrix(J) + "\n"
+                    steps += "Matriks Basis:\n" + format_matrix(P) + "\n"
+
+                except Exception as e:
+                    messagebox.showerror("Error", f"Terjadi kesalahan: {e}")
+                    return
 
         text_steps.insert(tk.END, steps)
         text_result.insert(tk.END, format_matrix(result))
@@ -239,77 +266,115 @@ def perform_operation():
     except ValueError:
         messagebox.showerror("Error", "Masukkan angka yang valid.")
 
+
+def update_scalar_input(*args):
+    """Menampilkan atau menyembunyikan input skalar berdasarkan pilihan operasi"""
+    if operation.get() == "Perkalian Skalar":
+        entry_scalar.grid(row=5, column=1, padx=5, pady=5)
+        entry_scalar_label.grid(row=5, column=0, padx=5, pady=5, sticky='e')
+    else:
+        entry_scalar.grid_remove()
+        entry_scalar_label.grid_remove()
+
+
 # Inisialisasi Tkinter
 root = tk.Tk()
 root.title("Kalkulator Matriks")
-root.geometry("800x600")
+root.geometry("700x800")
 
 # Frame untuk input
 frame_input = tk.Frame(root)
 frame_input.pack(pady=10)
 
-# Input untuk jumlah baris dan kolom matriks A
-tk.Label(frame_input, text="Matriks A (Baris):").grid(row=0, column=0)
-entry_rows_a = tk.Entry(frame_input, width=5)
-entry_rows_a.grid(row=0, column=1)
-
-tk.Label(frame_input, text="Matriks A (Kolom):").grid(row=0, column=2)
-entry_cols_a = tk.Entry(frame_input, width=5)
-entry_cols_a.grid(row=0, column=3)
-
-# Input untuk jumlah baris dan kolom matriks B
-tk.Label(frame_input, text="Matriks B (Baris):").grid(row=1, column=0)
-entry_rows_b = tk.Entry(frame_input, width=5)
-entry_rows_b.grid(row=1, column=1)
-
-tk.Label(frame_input, text="Matriks B (Kolom):").grid(row=1, column=2)
-entry_cols_b = tk.Entry(frame_input, width=5)
-entry_cols_b.grid(row=1, column=3)
-
-# Dropdown untuk operasi
+# Dropdown untuk operasi (Urutan 1)
 operation = tk.StringVar(value="Penjumlahan")
-operation_menu = tk.OptionMenu(frame_input, operation, "Penjumlahan", "Pengurangan", "Perkalian Matriks", "Perkalian Skalar", "Determinant", "Transpose", "Invers", "SPL", "Gauss-Jordan")
-operation_menu.grid(row=2, column=0, columnspan=4)
+operation.trace("w", update_scalar_input)  # Memanggil fungsi saat pilihan berubah
+tk.Label(frame_input, text="Pilih Operasi:").grid(row=0, column=0, padx=5, pady=5, sticky='e')
+operation_menu = tk.OptionMenu(frame_input, operation, "Penjumlahan", "Pengurangan", "Perkalian Matriks",
+                               "Perkalian Skalar", "Determinant", "Transpose", "Invers", "Gauss-Jordan", "SPL", "Jordan Normal Form")
+operation_menu.grid(row=0, column=1, columnspan=3, padx=5, pady=5)
 
-# Input untuk skalar
-tk.Label(frame_input, text="Skalar:").grid(row=3, column=0)
-entry_scalar = tk.Entry(frame_input, width=5)
-entry_scalar.grid(row=3, column=1)
+# Input untuk jumlah baris dan kolom matriks A (Urutan 2)
+tk.Label(frame_input, text="Matriks A (Baris):").grid(row=1, column=0, padx=5, pady=5, sticky='e')
+entry_rows_a = tk.Entry(frame_input, width=5)
+entry_rows_a.grid(row=1, column=1, padx=5, pady=5)
 
-# Pilihan matriks untuk perhitungan skalar
+tk.Label(frame_input, text="Matriks A (Kolom):").grid(row=1, column=2, padx=5, pady=5, sticky='e')
+entry_cols_a = tk.Entry(frame_input, width=5)
+entry_cols_a.grid(row=1, column=3, padx=5, pady=5)
+
+# Input untuk jumlah baris dan kolom matriks B (Urutan 3)
+tk.Label(frame_input, text="Matriks B (Baris):").grid(row=2, column=0, padx=5, pady=5, sticky='e')
+entry_rows_b = tk.Entry(frame_input, width=5)
+entry_rows_b.grid(row=2, column=1, padx=5, pady=5)
+
+tk.Label(frame_input, text="Matriks B (Kolom):").grid(row=2, column=2, padx=5, pady=5, sticky='e')
+entry_cols_b = tk.Entry(frame_input, width=5)
+entry_cols_b.grid(row=2, column=3, padx=5, pady=5)
+
+# Tombol untuk membuat input matriks
+button_create_matrix = tk.Button(frame_input, text="Buat Matriks", command=create_matrix_entries)
+button_create_matrix.grid(row=3, column=0, columnspan=4, pady=10)
+
+# Input untuk skalar (Urutan 4, disembunyikan default)
+entry_scalar_label = tk.Label(frame_input, text="Nilai Skalar:")
+entry_scalar = tk.Entry(frame_input, width=10)
+entry_scalar.grid_remove()
+entry_scalar_label.grid_remove()
+
+# Dropdown untuk memilih matriks (Urutan 5)
+tk.Label(frame_input, text="Pilih Matriks untuk Skalar:").grid(row=4, column=0, padx=5, pady=5, sticky='e')
 option_matrix = tk.StringVar(value="Matriks A")
-option_menu = tk.OptionMenu(frame_input, option_matrix, "Matriks A", "Matriks B")
-option_menu.grid(row=3, column=2)
-
-# Tombol untuk membuat entri matriks dan menghitung hasil
-tk.Button(frame_input, text="Buat Entri Matriks", command=create_matrix_entries).grid(row=4, column=0)
-tk.Button(frame_input, text="Hitung", command=perform_operation).grid(row=4, column=1)
-tk.Button(frame_input, text="Reset", command=reset_fields).grid(row=4, column=2)
+matrix_menu = tk.OptionMenu(frame_input, option_matrix, "Matriks A", "Matriks B")
+matrix_menu.grid(row=4, column=1, padx=5, pady=5)
 
 # Frame untuk matriks A dan B
-frame_a = tk.Frame(root)
-frame_a.pack(side=tk.LEFT, padx=10)
+frame_matrices = tk.Frame(root)
+frame_matrices.pack(pady=10)
 
-frame_b = tk.Frame(root)
-frame_b.pack(side=tk.LEFT, padx=10)
+frame_a = tk.Frame(frame_matrices)
+frame_a.grid(row=0, column=0, padx=10)
 
-# Scrollbar untuk hasil
-scrollbar = Scrollbar(root)
-scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+frame_b = tk.Frame(frame_matrices)
+frame_b.grid(row=0, column=1, padx=10)
 
-# Frame untuk langkah-langkah
-text_steps = tk.Text(root, width=40, height=20, yscrollcommand=scrollbar.set)
-text_steps.pack(padx=10, pady=10)
-
-# Frame untuk hasil
-text_result = tk.Text(root, width=40, height=20, yscrollcommand=scrollbar.set)
-text_result.pack(padx=10, pady=10)
-
-scrollbar.config(command=lambda *args: [text_steps.yview(*args), text_result.yview(*args)])
-
-# Daftar untuk menyimpan entri matriks
 entries_a = []
 entries_b = []
 
-# Menjalankan aplikasi
+# Tombol untuk melakukan operasi
+button_calculate = tk.Button(root, text="Hitung", command=perform_operation)
+button_calculate.pack(pady=10)
+
+# Tombol untuk reset
+button_reset = tk.Button(root, text="Reset", command=reset_fields)
+button_reset.pack(pady=10)
+
+# Area teks untuk langkah-langkah dan hasil
+frame_results = tk.Frame(root)
+frame_results.pack(pady=10)
+
+tk.Label(frame_results, text="Langkah-langkah:").grid(row=0, column=0, padx=5, pady=5)
+
+# Tambahkan scrollbar untuk langkah-langkah
+scroll_steps = tk.Scrollbar(frame_results)
+scroll_steps.grid(row=1, column=0, sticky='ns', pady=5)
+
+text_steps = tk.Text(frame_results, width=40, height=10, yscrollcommand=scroll_steps.set)
+text_steps.grid(row=1, column=0, padx=5, pady=5)
+
+scroll_steps.config(command=text_steps.yview)  # Menghubungkan scrollbar dengan area teks
+
+tk.Label(frame_results, text="Hasil:").grid(row=0, column=1, padx=5, pady=5)
+
+# Tambahkan scrollbar untuk hasil
+scroll_result = tk.Scrollbar(frame_results)
+scroll_result.grid(row=1, column=1, sticky='ns', pady=5)
+
+text_result = tk.Text(frame_results, width=40, height=10, yscrollcommand=scroll_result.set)
+text_result.grid(row=1, column=1, padx=5, pady=5)
+
+scroll_result.config(command=text_result.yview)  # Menghubungkan scrollbar dengan area teks
+
+
+# Menjalankan aplikasi Tkinter
 root.mainloop()
