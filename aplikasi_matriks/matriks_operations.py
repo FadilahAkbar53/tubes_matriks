@@ -147,6 +147,44 @@ def perform_operation():
                 result = np.linalg.inv(a)
                 steps += "Langkah-langkah Invers:\n"
                 steps += format_matrix(result) + "\n"
+                
+            elif operation.get() == "Gauss-Jordan":
+                try:
+                    # Implementasi eliminasi Gauss-Jordan
+                    m, n = a.shape
+
+                    steps += "Langkah-langkah eliminasi Gauss-Jordan:\n"
+
+                    # Proses eliminasi
+                    for i in range(min(m, n)):
+                        # Mencari baris dengan nilai maksimum di kolom i
+                        max_row = np.argmax(np.abs(a[i:, i])) + i
+                        if max_row != i:
+                            steps += f"Tukar baris {i+1} dengan baris {max_row+1}\n"
+                        a[[i, max_row]] = a[[max_row, i]]
+
+                        # Buat pivot menjadi 1
+                        pivot = a[i, i]
+                        if pivot != 0:
+                            a[i] = a[i] / pivot
+                            steps += f"Skalakan baris {i+1} agar elemen pivot menjadi 1\n"
+
+                        # Eliminasi elemen di atas dan di bawah pivot
+                        for j in range(m):
+                            if j != i:
+                                factor = a[j, i]
+                                if factor != 0:
+                                    a[j] = a[j] - factor * a[i]
+                                    steps += f"Kurangi {factor} * baris {i+1} dari baris {j+1}\n"
+
+                    # Output hasil akhir
+                    result = a
+                    steps += "Matriks setelah eliminasi Gauss-Jordan:\n"
+                    steps += format_matrix(result) + "\n"
+                    
+                except Exception as e:
+                    messagebox.showerror("Error", f"Terjadi kesalahan: {e}")
+                    return
 
             elif operation.get() == "SPL":
                 try:
@@ -230,7 +268,7 @@ entry_cols_b.grid(row=1, column=3)
 
 # Dropdown untuk operasi
 operation = tk.StringVar(value="Penjumlahan")
-operation_menu = tk.OptionMenu(frame_input, operation, "Penjumlahan", "Pengurangan", "Perkalian Matriks", "Perkalian Skalar", "Determinant", "Transpose", "Invers", "SPL")
+operation_menu = tk.OptionMenu(frame_input, operation, "Penjumlahan", "Pengurangan", "Perkalian Matriks", "Perkalian Skalar", "Determinant", "Transpose", "Invers", "SPL", "Gauss-Jordan")
 operation_menu.grid(row=2, column=0, columnspan=4)
 
 # Input untuk skalar
