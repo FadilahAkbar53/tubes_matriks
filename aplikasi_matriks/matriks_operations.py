@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox, Scrollbar, Frame
 import numpy as np
+import random
 
 
 def reset_fields():
@@ -73,6 +74,8 @@ def clear_matrix_entries():
 def format_matrix(matrix):
     """Format output sebagai string matriks."""
     return "\n".join(["\t".join([f"{val:.2f}" for val in row]) for row in matrix])
+
+
 
 
 def perform_operation():
@@ -303,6 +306,30 @@ def update_scalar_input(*args):
         entry_scalar.grid_remove()
         entry_scalar_label.grid_remove()
 
+def randomize_matrices():
+    """Mengisi matriks A dan B dengan nilai acak antara 0 hingga 5."""
+    try:
+        rows_a = int(entry_rows_a.get())
+        cols_a = int(entry_cols_a.get())
+        rows_b = int(entry_rows_b.get())
+        cols_b = int(entry_cols_b.get())
+
+        # Isi matriks A dengan angka acak
+        for i in range(rows_a):
+            for j in range(cols_a):
+                entries_a[i][j].delete(0, tk.END)  # Kosongkan entri
+                random_value = random.randint(0, 5)  # Menghasilkan nilai acak antara 0 dan 5
+                entries_a[i][j].insert(0, str(random_value))  # Masukkan nilai acak ke entri
+
+        # Isi matriks B dengan angka acak
+        for i in range(rows_b):
+            for j in range(cols_b):
+                entries_b[i][j].delete(0, tk.END)  # Kosongkan entri
+                random_value = random.randint(0, 5)  # Menghasilkan nilai acak antara 0 dan 5
+                entries_b[i][j].insert(0, str(random_value))  # Masukkan nilai acak ke entri
+
+    except ValueError:
+        messagebox.showerror("Error", "Masukkan angka yang valid.")
 
 # Inisialisasi Tkinter
 root = tk.Tk()
@@ -341,7 +368,7 @@ entry_cols_b.grid(row=2, column=3, padx=5, pady=5)
 
 # Tombol untuk membuat input matriks
 button_create_matrix = tk.Button(frame_input, text="Buat Matriks", command=create_matrix_entries)
-button_create_matrix.grid(row=3, column=0, columnspan=4, pady=10)
+button_create_matrix.grid(row=3, column=0, columnspan=4,  pady=10)
 
 # Input untuk skalar (Urutan 4, disembunyikan default)
 entry_scalar_label = tk.Label(frame_input, text="Nilai Skalar:")
@@ -368,13 +395,21 @@ frame_b.grid(row=0, column=1, padx=10)
 entries_a = []
 entries_b = []
 
+# Tombol untuk melakukan randomize matriks
+button_calculate = tk.Button(root, text="Randomize Matriks", command=randomize_matrices)
+button_calculate.pack(pady=10)# Tombol untuk melakukan operasi
+
+# Frame untuk tombol operasi dan reset
+frame_buttons = tk.Frame(root)
+frame_buttons.pack(pady=10)
+
 # Tombol untuk melakukan operasi
-button_calculate = tk.Button(root, text="Hitung", command=perform_operation)
-button_calculate.pack(pady=10)
+button_calculate = tk.Button(frame_buttons, text="Hitung", command=perform_operation)
+button_calculate.grid(row=0, column=0, padx=10)
 
 # Tombol untuk reset
-button_reset = tk.Button(root, text="Reset", command=reset_fields)
-button_reset.pack(pady=10)
+button_reset = tk.Button(frame_buttons, text="Reset", command=reset_fields)
+button_reset.grid(row=0, column=1, padx=10)
 
 # Area teks untuk langkah-langkah dan hasil
 frame_results = tk.Frame(root)
