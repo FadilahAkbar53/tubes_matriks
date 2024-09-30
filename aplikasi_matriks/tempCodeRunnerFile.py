@@ -258,25 +258,41 @@ def perform_operation():
                     messagebox.showerror("Error", f"Terjadi kesalahan: {e}")
                     return
 
+            # Perbaiki bagian SPL dalam fungsi solve_spl
             elif operation.get() == "SPL":
                 try:
                     augmented_matrix = np.hstack([a, b])
                     rows, cols = augmented_matrix.shape
 
-                    # Eliminasi Gauss
-                    for i in range(min(rows, cols - 1)):
-                        if augmented_matrix[i, i] == 0:
+                    if selected_method.get() == "Gauss":
+                        # Metode Gauss
+                        for i in range(min(rows, cols - 1)):
+                            if augmented_matrix[i, i] == 0:
+                                for j in range(i + 1, rows):
+                                    if augmented_matrix[j, i] != 0:
+                                        augmented_matrix[[i, j]] = augmented_matrix[[j, i]]
+                                        break
+                            if augmented_matrix[i, i] != 0:
+                                augmented_matrix[i] = augmented_matrix[i] / augmented_matrix[i, i]
                             for j in range(i + 1, rows):
-                                if augmented_matrix[j, i] != 0:
-                                    augmented_matrix[[i, j]] = augmented_matrix[[j, i]]
-                                    break
-                        if augmented_matrix[i, i] != 0:
-                            augmented_matrix[i] = augmented_matrix[i] / augmented_matrix[i, i]
-                        for j in range(i + 1, rows):
-                            augmented_matrix[j] = augmented_matrix[j] - augmented_matrix[i] * augmented_matrix[j, i]
+                                augmented_matrix[j] = augmented_matrix[j] - augmented_matrix[i] * augmented_matrix[j, i]
 
-                    steps += "Langkah-langkah Penyelesaian SPL menggunakan eliminasi Gauss:\n"
-                    steps += "Matriks setelah eliminasi Gauss:\n"
+                    elif selected_method.get() == "Gauss-Jordan":
+                        # Metode Gauss-Jordan
+                        for i in range(min(rows, cols - 1)):
+                            if augmented_matrix[i, i] == 0:
+                                for j in range(i + 1, rows):
+                                    if augmented_matrix[j, i] != 0:
+                                        augmented_matrix[[i, j]] = augmented_matrix[[j, i]]
+                                        break
+                            if augmented_matrix[i, i] != 0:
+                                augmented_matrix[i] = augmented_matrix[i] / augmented_matrix[i, i]
+                            for j in range(rows):
+                                if j != i:
+                                    augmented_matrix[j] = augmented_matrix[j] - augmented_matrix[i] * augmented_matrix[j, i]
+
+                    steps += "Langkah-langkah Penyelesaian SPL menggunakan " + selected_method.get() + ":\n"
+                    steps += "Matriks setelah eliminasi:\n"
                     steps += format_matrix(augmented_matrix) + "\n"
 
                     no_solution = False
@@ -304,6 +320,7 @@ def perform_operation():
                 except Exception as e:
                     messagebox.showerror("Error", f"Terjadi kesalahan: {e}")
                     return
+
                 # Tambahkan operasi lain sesuai kebutuhan
             elif operation.get() == "Jordan Normal Form":
                 try:
