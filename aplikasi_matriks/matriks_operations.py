@@ -258,25 +258,41 @@ def perform_operation():
                     messagebox.showerror("Error", f"Terjadi kesalahan: {e}")
                     return
 
+            # Perbaiki bagian SPL dalam fungsi solve_spl
             elif operation.get() == "SPL":
                 try:
                     augmented_matrix = np.hstack([a, b])
                     rows, cols = augmented_matrix.shape
 
-                    # Eliminasi Gauss
-                    for i in range(min(rows, cols - 1)):
-                        if augmented_matrix[i, i] == 0:
+                    if selected_method.get() == "Gauss":
+                        # Metode Gauss
+                        for i in range(min(rows, cols - 1)):
+                            if augmented_matrix[i, i] == 0:
+                                for j in range(i + 1, rows):
+                                    if augmented_matrix[j, i] != 0:
+                                        augmented_matrix[[i, j]] = augmented_matrix[[j, i]]
+                                        break
+                            if augmented_matrix[i, i] != 0:
+                                augmented_matrix[i] = augmented_matrix[i] / augmented_matrix[i, i]
                             for j in range(i + 1, rows):
-                                if augmented_matrix[j, i] != 0:
-                                    augmented_matrix[[i, j]] = augmented_matrix[[j, i]]
-                                    break
-                        if augmented_matrix[i, i] != 0:
-                            augmented_matrix[i] = augmented_matrix[i] / augmented_matrix[i, i]
-                        for j in range(i + 1, rows):
-                            augmented_matrix[j] = augmented_matrix[j] - augmented_matrix[i] * augmented_matrix[j, i]
+                                augmented_matrix[j] = augmented_matrix[j] - augmented_matrix[i] * augmented_matrix[j, i]
 
-                    steps += "Langkah-langkah Penyelesaian SPL menggunakan eliminasi Gauss:\n"
-                    steps += "Matriks setelah eliminasi Gauss:\n"
+                    elif selected_method.get() == "Gauss-Jordan":
+                        # Metode Gauss-Jordan
+                        for i in range(min(rows, cols - 1)):
+                            if augmented_matrix[i, i] == 0:
+                                for j in range(i + 1, rows):
+                                    if augmented_matrix[j, i] != 0:
+                                        augmented_matrix[[i, j]] = augmented_matrix[[j, i]]
+                                        break
+                            if augmented_matrix[i, i] != 0:
+                                augmented_matrix[i] = augmented_matrix[i] / augmented_matrix[i, i]
+                            for j in range(rows):
+                                if j != i:
+                                    augmented_matrix[j] = augmented_matrix[j] - augmented_matrix[i] * augmented_matrix[j, i]
+
+                    steps += "Langkah-langkah Penyelesaian SPL menggunakan " + selected_method.get() + ":\n"
+                    steps += "Matriks setelah eliminasi:\n"
                     steps += format_matrix(augmented_matrix) + "\n"
 
                     no_solution = False
@@ -441,9 +457,23 @@ frame_buttons.pack(pady=10)
 button_calculate = tk.Button(frame_buttons, text="Hitung", command=perform_operation)
 button_calculate.grid(row=0, column=0, padx=10)
 
+# Frame untuk hasil
+frame_results = tk.Frame(root)
+frame_results.pack(pady=10)
+
+tk.Label(frame_results, text="Langkah-langkah:").grid(row=0, column=0, padx=5, pady=5)
+
+# Add the radio buttons for method selection
+selected_method = tk.StringVar(value="Gauss")  # Default ke metode Gauss
+radio_gauss = tk.Radiobutton(frame_results, text="Metode Gauss", variable=selected_method, value="Gauss")
+radio_gauss.grid(row=2, column=0, padx=5, pady=5)
+
+radio_gauss_jordan = tk.Radiobutton(frame_results, text="Metode Gauss-Jordan", variable=selected_method, value="Gauss-Jordan")
+radio_gauss_jordan.grid(row=2, column=1, padx=5, pady=5)
+
 # Tombol untuk reset
-button_reset = tk.Button(frame_buttons, text="Reset", command=reset_fields)
-button_reset.grid(row=0, column=1, padx=10)
+button_reset = tk.Button(root, text="Reset", command=reset_fields)
+button_reset.pack(pady=10)
 
 # Area teks untuk langkah-langkah dan hasil
 frame_results = tk.Frame(root)
