@@ -134,26 +134,53 @@ def perform_operation():
                         steps += " + ".join([f"({a[i][k]} * {b[k][j]})" for k in range(cols_a)]) + f" = {step_value}\n"
 
             elif operation.get() == "Determinant":
-                if rows_a != cols_a:
-                    messagebox.showerror("Error", "Determinant hanya dapat dihitung untuk matriks kuadrat.")
-                    return
-                result = np.linalg.det(a)
-                steps += f"Determinant Matriks A: {result}\n"
+                selected_matrix = option_matrix.get()
+                if selected_matrix == "Matriks A":
+                    if rows_a != cols_a:
+                        messagebox.showerror("Error", "Determinant hanya dapat dihitung untuk matriks kuadrat.")
+                        return
+                    steps += "Langkah-langkah perhitungan Determinant Matriks A:\n"
+                    result = np.linalg.det(a)
+                    steps += f"Determinant Matriks A: {result}\n"
+                elif selected_matrix == "Matriks B":
+                    if rows_b != cols_b:
+                        messagebox.showerror("Error", "Determinant hanya dapat dihitung untuk matriks kuadrat.")
+                        return
+                    steps += "Langkah-langkah perhitungan Determinant Matriks B:\n"
+                    result = np.linalg.det(b)
+                    steps += f"Determinant Matriks B: {result}\n"
 
             elif operation.get() == "Transpose":
-                result = np.transpose(a)
-                steps += "Langkah-langkah Transpose:\n"
-                for i in range(cols_a):
-                    for j in range(rows_a):
-                        steps += f"({a[j][i]}) => ({i},{j})\n"
+                selected_matrix = option_matrix.get()
+                if selected_matrix == "Matriks A":
+                    result = np.transpose(a)
+                    steps += "Langkah-langkah Transpose Matriks A:\n"
+                    for i in range(cols_a):
+                        for j in range(rows_a):
+                            steps += f"({a[j][i]}) => ({i},{j})\n"
+                elif selected_matrix == "Matriks B":
+                    result = np.transpose(b)
+                    steps += "Langkah-langkah Transpose Matriks B:\n"
+                    for i in range(cols_b):
+                        for j in range(rows_b):
+                            steps += f"({b[j][i]}) => ({i},{j})\n"
 
             elif operation.get() == "Invers":
-                if rows_a != cols_a:
-                    messagebox.showerror("Error", "Invers hanya dapat dihitung untuk matriks kuadrat.")
-                    return
-                result = np.linalg.inv(a)
-                steps += "Langkah-langkah Invers:\n"
-                steps += format_matrix(result) + "\n"
+                selected_matrix = option_matrix.get()
+                if selected_matrix == "Matriks A":
+                    if rows_a != cols_a:
+                        messagebox.showerror("Error", "Invers hanya dapat dihitung untuk matriks kuadrat.")
+                        return
+                    result = np.linalg.inv(a)
+                    steps += "Langkah-langkah Invers Matriks A:\n"
+                    steps += format_matrix(result) + "\n"
+                elif selected_matrix == "Matriks B":
+                    if rows_b != cols_b:
+                        messagebox.showerror("Error", "Invers hanya dapat dihitung untuk matriks kuadrat.")
+                        return
+                    result = np.linalg.inv(b)
+                    steps += "Langkah-langkah Invers Matriks B:\n"
+                    steps += format_matrix(result) + "\n"
 
             # Tambahkan operasi lain sesuai kebutuhan
             elif operation.get() == "Gauss-Jordan":
