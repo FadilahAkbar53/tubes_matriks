@@ -365,13 +365,36 @@ def randomize_matrices():
     except ValueError:
         messagebox.showerror("Error", "Masukkan angka yang valid.")
 
+# Fungsi untuk membuat frame yang bisa di-scroll
+def add_scrollable_frame(container):
+    """Tambahkan area scrollable di frame."""
+    canvas = tk.Canvas(container)
+    scrollbar = tk.Scrollbar(container, orient="vertical", command=canvas.yview)
+    scrollable_frame = tk.Frame(canvas)
+
+    scrollable_frame.bind(
+        "<Configure>",
+        lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+    )
+
+    canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+    canvas.configure(yscrollcommand=scrollbar.set)
+
+    canvas.pack(side="left", fill="both", expand=True)
+    scrollbar.pack(side="right", fill="y")
+
+    return scrollable_frame
+
 # Inisialisasi Tkinter
 root = tk.Tk()
 root.title("Kalkulator Matriks")
 root.geometry("700x800")
 
+# Buat frame scrollable untuk semua isi aplikasi
+main_frame = add_scrollable_frame(root)
+
 # Frame untuk input
-frame_input = tk.Frame(root)
+frame_input = tk.Frame(main_frame)
 frame_input.pack(pady=10)
 
 # Dropdown untuk operasi (Urutan 1)
@@ -402,7 +425,7 @@ entry_cols_b.grid(row=2, column=3, padx=5, pady=5)
 
 # Tombol untuk membuat input matriks
 button_create_matrix = tk.Button(frame_input, text="Buat Matriks", command=create_matrix_entries)
-button_create_matrix.grid(row=3, column=0, columnspan=4,  pady=10)
+button_create_matrix.grid(row=3, column=0, columnspan=4, pady=10)
 
 # Input untuk skalar (Urutan 4, disembunyikan default)
 entry_scalar_label = tk.Label(frame_input, text="Nilai Skalar:")
@@ -417,7 +440,7 @@ matrix_menu = tk.OptionMenu(frame_input, option_matrix, "Matriks A", "Matriks B"
 matrix_menu.grid(row=4, column=1, padx=5, pady=5)
 
 # Frame untuk matriks A dan B
-frame_matrices = tk.Frame(root)
+frame_matrices = tk.Frame(main_frame)
 frame_matrices.pack(pady=10)
 
 frame_a = tk.Frame(frame_matrices)
@@ -430,11 +453,11 @@ entries_a = []
 entries_b = []
 
 # Tombol untuk melakukan randomize matriks
-button_calculate = tk.Button(root, text="Randomize Matriks", command=randomize_matrices)
-button_calculate.pack(pady=10)# Tombol untuk melakukan operasi
+button_calculate = tk.Button(main_frame, text="Randomize Matriks", command=randomize_matrices)
+button_calculate.pack(pady=10)
 
 # Frame untuk tombol operasi dan reset
-frame_buttons = tk.Frame(root)
+frame_buttons = tk.Frame(main_frame)
 frame_buttons.pack(pady=10)
 
 # Tombol untuk melakukan operasi
@@ -442,7 +465,7 @@ button_calculate = tk.Button(frame_buttons, text="Hitung", command=perform_opera
 button_calculate.grid(row=0, column=0, padx=10)
 
 # Frame untuk hasil
-frame_results = tk.Frame(root)
+frame_results = tk.Frame(main_frame)
 frame_results.pack(pady=10)
 
 tk.Label(frame_results, text="Langkah-langkah:").grid(row=0, column=0, padx=5, pady=5)
@@ -456,13 +479,10 @@ radio_gauss_jordan = tk.Radiobutton(frame_results, text="Metode Gauss-Jordan", v
 radio_gauss_jordan.grid(row=2, column=1, padx=5, pady=5)
 
 # Tombol untuk reset
-button_reset = tk.Button(root, text="Reset", command=reset_fields)
+button_reset = tk.Button(main_frame, text="Reset", command=reset_fields)
 button_reset.pack(pady=10)
 
 # Area teks untuk langkah-langkah dan hasil
-frame_results = tk.Frame(root)
-frame_results.pack(pady=10)
-
 tk.Label(frame_results, text="Langkah-langkah:").grid(row=0, column=0, padx=5, pady=5)
 
 # Tambahkan scrollbar untuk langkah-langkah
@@ -485,6 +505,6 @@ text_result.grid(row=1, column=1, padx=5, pady=5)
 
 scroll_result.config(command=text_result.yview)  # Menghubungkan scrollbar dengan area teks
 
-
 # Menjalankan aplikasi Tkinter
 root.mainloop()
+
